@@ -1,5 +1,6 @@
 git init
-git add README.md 
-git commit -m Initial commit
+git add README.md
+git commit -m "Initial commit"
 git branch -M main
-git remove add origin https
+git remote add origin https://github.com/yourusername/hackathon-league.git
+git push -u origin main
