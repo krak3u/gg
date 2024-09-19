@@ -1,43 +1,63 @@
-// server.js (Node.js + Express)
+// server.js
 const express = require('express');
-const mongoose = require('mongoose');
 const app = express();
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 
-// Подключение к MongoDB
-mongoose.connect('mongodb://localhost:27017/hackathon_league', { useNewUrlParser: true, useUnifiedTopology: true });
-
-// Модель участника
-const Participant = mongoose.model('Participant', {
-    name: String,
-    team: String,
-    rating: Number,
-    role: String
-});
-
-// Получение всех участников
-app.get('/participants', async (req, res) => {
-    const participants = await Participant.find();
-    res.json(participants);
-});
-
-// Создание нового участника
-app.post('/participants', async (req, res) => {
-    const participant = new Participant(req.body);
-    await participant.save();
-    res.json(participant);
-});
+let teams = [
+  {
+    id: 1,
+    name: 'Team Alpha',
+    members: ['Alice', 'Bob', 'Charlie'],
+    rating: 85
+  },
+  {
+    id: 2,
+    name: 'Team Beta',
+    members: ['David', 'Eva', 'Frank'],
+    rating: 90
+  },
+  {
+    id: 3,
+    name: 'Team Gamma',
+    members: ['George', 'Helen', 'Irene'],
+    rating: 78
+  }
+];
 
 // Получение всех команд
-app.get('/teams', async (req, res) => {
-    const teams = await Participant.aggregate([
-        { $group: { _id: "$team", avgRating: { $avg: "$rating" } } },
-        { $sort: { avgRating: -1 } }
-    ]);
-    res.json(teams);
+app.get('/teams', (req, res) => {
+  res.json(teams);
 });
 
-// Запуск сервера
-app.listen(5000, () => {
-    console.log('Server is running on port 5000');
+// Получение информации по одной команде
+app.get('/teams/:id', (req, res) => {
+  const team = teams.find(t => t.id == req.params.id);
+  if (team) {
+    res.json(team);
+  } else {
+    res.status(404).send('Team not found');
+  }
+});
+
+// Функция для сортировки команд
+app.get('/teams/sort', (req, res) => {
+  const sortedTeams = [...teams].sort((a, b) => b.rating - a.rating);
+  res.json(sortedTeams);
+});
+
+// AI-помощник: фильтрация команд по запросу
+app.post('/teams/filter', (req, res) => {
+  const { searchQuery } = req.body;
+  const filteredTeams = teams.filter(team => 
+    team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    team.members.some(member => member.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  res.json(filteredTeams);
+});
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
