@@ -4,7 +4,7 @@ from datetime import datetime
 
 # Токен вашего бота
 TOKEN = 'YOUR_BOT_TOKEN'
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(7922992421:AAE72rmI31ZMH4JW2hfYc6COtnuczMMx970)
 
 # Хранение данных пользователей, команд и мероприятий
 teams = {}
